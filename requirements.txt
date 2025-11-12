@@ -1,0 +1,41 @@
+# Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Computer Vision & Image Processing
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Barcode Generation
+python-barcode>=0.15.0
+
+# DataMatrix support (requires libdmtx system library - see installation notes below)
+# pylibdmtx>=0.1.10
+
+# Training & Utilities
+tqdm>=4.65.0
+matplotlib>=3.7.0
+
+# Optional: for better training
+# tensorboard>=2.13.0
+# wandb>=0.15.0
+
+# ==========================================
+# Installation Notes:
+# ==========================================
+# 
+# For DataMatrix support, you need to install libdmtx first:
+#
+# Ubuntu/Debian:
+#   sudo apt-get install libdmtx0b libdmtx-dev
+#
+# macOS:
+#   brew install libdmtx
+#
+# Then uncomment pylibdmtx in this file
+#
+# ==========================================
+# Install with:
+#   pip install -r requirements.txt --break-system-packages
+# ==========================================
