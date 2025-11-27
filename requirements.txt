@@ -1,31 +1,38 @@
-# Deep Learning
+# ==========================================
+# Rami Levi Warehouse Barcode Detection
+# Synthetic Dataset Generator with Scandit
+# ==========================================
+
+# Core Dependencies
+# ==========================================
+
+# Deep Learning & Computer Vision
 torch>=2.0.0
 torchvision>=0.15.0
-
-# Computer Vision & Image Processing
 opencv-python>=4.8.0
 Pillow>=10.0.0
 numpy>=1.24.0
 
 # Barcode Generation
 python-barcode>=0.15.0
+pylibdmtx>=0.1.10  # DataMatrix support (requires libdmtx system library)
 
-# DataMatrix support (requires libdmtx system library - see installation notes below)
-# pylibdmtx>=0.1.10
+# YOLO & Object Detection
+ultralytics>=8.0.0  # YOLOv8/v11/v12
 
-# Training & Utilities
+# Utilities
 tqdm>=4.65.0
 matplotlib>=3.7.0
+PyYAML>=6.0
 
-# Optional: for better training
-# tensorboard>=2.13.0
-# wandb>=0.15.0
+# Scandit SDK (included in scandit/ directory)
+# No pip installation needed - included locally
 
 # ==========================================
-# Installation Notes:
+# System Dependencies Required
 # ==========================================
-# 
-# For DataMatrix support, you need to install libdmtx first:
+#
+# For DataMatrix barcode generation (libdmtx):
 #
 # Ubuntu/Debian:
 #   sudo apt-get install libdmtx0b libdmtx-dev
@@ -33,9 +40,15 @@ matplotlib>=3.7.0
 # macOS:
 #   brew install libdmtx
 #
-# Then uncomment pylibdmtx in this file
-#
 # ==========================================
-# Install with:
-#   pip install -r requirements.txt --break-system-packages
+# Installation
+# ==========================================
+#
+# 1. Install system dependencies (libdmtx)
+# 2. Install Python packages:
+#    pip install -r requirements.txt
+#
+# Or with --break-system-packages if needed:
+#    pip install -r requirements.txt --break-system-packages
+#
 # ==========================================

@@ -1,4 +1,9 @@
+# ==========================================
+# Rami Levi Warehouse Barcode Detection
+# ==========================================
+
 # Python
+# ==========================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -21,10 +26,14 @@ wheels/
 *.egg
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/
 boxcounter310/
+
+# IDE & Editors
+# ==========================================
 .vscode/
 .idea/
 *.swp
@@ -33,6 +42,9 @@ boxcounter310/
 .DS_Store
 .ipynb_checkpoints
 *.ipynb
+
+# Models & Weights (Heavy Files)
+# ==========================================
 models/
 *.pt
 *.pth
@@ -42,30 +54,39 @@ models/
 *.pkl
 *.weights
 *.caffemodel
+
+# Datasets & Images (Heavy Files - Input)
+# ==========================================
+# Dataset directories
 rami levy.v16i.yolov12/
 hires1_imgs/
 *.v*i.yolov*/
-data/warehouse_data_generator.py
 datasets/
 raw_data/
-images/
-labels/
+
+# Ignore data folders but not data/ code directory
+/images/
+/labels/
+
+# Output Directories (All Outputs)
+# ==========================================
+# Test outputs
 test_output/
 quick_test_output/
 test_improved/
+temp_detected_labels/
+
+# Generated synthetic data
 synthetic_dataset/
 synthetic_output/
 visualizations/
-temp_detected_labels/
 marked/
 output/
 runs/
 results/
-scandit/lib/
-scandit/*.deb
-scandit/libscandit*.so
-scandit/libscandit*.dylib
-*.deb
+
+# Media Files (Heavy)
+# ==========================================
 *.jpg
 *.jpeg
 *.png
@@ -76,11 +97,25 @@ scandit/libscandit*.dylib
 *.avi
 *.mov
 *.mkv
+
+# Scandit SDK (Heavy Libraries)
+# ==========================================
+scandit/lib/
+scandit/*.deb
+scandit/libscandit*.so
+scandit/libscandit*.dylib
+
+# Archives
+# ==========================================
 *.zip
 *.tar
 *.tar.gz
 *.rar
 *.7z
+*.deb
+
+# Logs & Temporary Files
+# ==========================================
 *.log
 logs/
 *.out
@@ -89,20 +124,21 @@ temp/
 *.tmp
 *.temp
 .cache/
+
+# OS Files
+# ==========================================
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# Testing & Coverage
+# ==========================================
 htmlcov/
 .coverage
 .coverage.*
 coverage.xml
 *.cover
-.idea/
-
-.vscode/
-
 .pytest_cache/
-
 .mypy_cache/
 .dmypy.json
 dmypy.json

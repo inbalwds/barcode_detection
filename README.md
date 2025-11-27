@@ -1,181 +1,120 @@
-# Barcode Detection & Synthetic Data Generator
+# Rami Levi Warehouse Barcode Detection
 
-מערכת לזיהוי ברקודים ויצירת נתונים סינטטיים לאימון מודלים של YOLO.
+Synthetic dataset generator for warehouse barcode detection using Scandit SDK and YOLO format annotations.
 
-## תכונות עיקריות
+## Overview
 
-### 🔍 זיהוי ברקודים עם Scandit
-- זיהוי **DataMatrix** (כולל L1-prefix)
-- זיהוי **Code128** (ברקודים על מדפים)
-- תמיכה במספר וריאנטים של תמונה (CLAHE, blur, threshold, rotation)
+This project generates synthetic training data for barcode detection in warehouse environments. It uses Scandit SDK to detect existing barcodes in warehouse images and replaces them with newly generated barcodes at exact locations, maintaining original orientation and size.
 
-### 🎨 יצירת נתונים סינטטיים
-- **מצב היברידי חכם**:
-  - אם נמצאו ברקודים → מחליף במיקום המדויק
-  - אם לא נמצאו → יוצר ברקודים רנדומליים על משטחים ומדפים
-- שימור orientation והגיאומטריה המקורית (perspective transform)
-- ברקודים L1-prefixed אוטומטיים
-- אוגמנטציות ריאליסטיות (blur, noise, rotation, lighting)
+### Features
 
-## דרישות מקדימות
+- **Scandit Integration**: Detects DataMatrix and Code128 barcodes in warehouse images
+- **Exact Placement**: Replaces barcodes at detected locations using perspective transforms
+- **Pattern-Based Generation**: Follows Rami Levi barcode patterns
+  - Product barcodes (DataMatrix): `L1000000000` + 9 random digits
+  - Shelf barcodes (Code128): 4 digits + `1` + 2 digits
+- **Hybrid Mode**: Detects and replaces existing barcodes, optionally adds random ones
+- **YOLO Format**: Generates annotations compatible with YOLO object detection
+- **Progress Tracking**: Real-time statistics every 10 frames
+
+## Quick Start
+
+### Prerequisites
 
 ```bash
-pip install opencv-python numpy pillow python-barcode pyyaml
+# System dependencies
+sudo apt-get install libdmtx0b libdmtx-dev
+
+# Python dependencies
+pip install -r requirements.txt
 ```
 
-### Scandit SDK
-- נדרש רשיון Scandit תקף
-- הספרייה צריכה להיות ב-`scandit/` directory
+### Basic Usage
 
-## הגדרה מהירה
-
-1. **הגדר את ה-config.yaml**:
-```yaml
-license_key: "YOUR_SCANDIT_LICENSE_KEY"
-INPUT_IMAGES_DIR: '/path/to/images'
-CLASS_NAMES: ['box', 'empty_shelves', 'palletes', 'product_barcodes', 'shelf', 'shelf_barcodes']
-```
-
-2. **הרץ טסט מהיר**:
 ```bash
-python3 quick_test_scandit.py
-```
-
-3. **צור dataset מלא**:
-```bash
+# Generate synthetic dataset
 python3 generate_synthetic_with_scandit.py \
-    --input-images /path/to/images \
-    --output-images /path/to/output/images \
+    --input-images ./input_images \
+    --input-labels ./input_labels \
+    --output-images ./output/images \
+    --output-labels ./output/labels \
     --num-augmentations 5
 ```
 
-## שימוש פרוגרמטי
+### Quick Test
 
-```python
-from data.improved_warehouse_generator import ImprovedWarehouseBarcodeGenerator
-
-# אתחול
-generator = ImprovedWarehouseBarcodeGenerator(
-    class_mapping={
-        'box': 0, 'empty_shelves': 1, 'palletes': 2,
-        'product_barcodes': 3, 'shelf': 4, 'shelf_barcodes': 5
-    },
-    scandit_license_key=license_key,
-    use_scandit=True
-)
-
-# עיבוד תמונה בודדת
-syn_image, annotations = generator.generate_synthetic_image(
-    image_path='warehouse.jpg',
-    annotation_path='warehouse.txt',
-    replace_detected=True,      # זיהוי והחלפה במיקום מדויק
-    add_random_barcodes=True    # הוספת ברקודים רנדומליים
-)
-
-# שמירה
-import cv2
-cv2.imwrite('output.jpg', syn_image)
-generator.save_yolo_annotations(annotations, 'output.txt')
+```bash
+# Test on a single image
+python3 quick_test_scandit.py
 ```
 
-## מבנה הפרויקט
+## Barcode Patterns
+
+### Product Barcode (DataMatrix)
+- **Pattern**: `^L1(0{9}\d{9})$`
+- **Format**: `L1` + `000000000` + 9 random digits
+- **Example**: `L1000000000123456789`
+- **Length**: 20 characters
+
+### Shelf Barcode (Code128)
+- **Pattern**: `^\d{4}1\d{2}$`
+- **Format**: 4 digits + `1` + 2 digits
+- **Example**: `2203156`
+- **Length**: 7 digits
+
+See RAMI_LEVI_BARCODE_PATTERNS.md for detailed pattern documentation.
+
+## Project Structure
 
 ```
 barcode_detection/
+├── README.md                          # This file
+├── requirements.txt                   # Python dependencies
+├── config.yaml                        # Scandit license key
+├── .gitignore                         # Git ignore rules
+│
 ├── data/
-│   └── improved_warehouse_generator.py  # גנרטור ראשי
+│   └── improved_warehouse_generator.py  # Main generator class
+│
 ├── scandit/
-│   ├── barcode_detector.py             # Scandit wrapper
-│   └── scanditsdk.py                   # Scandit SDK
-├── quick_test_scandit.py               # טסט מהיר
-├── test_scandit_synthetic_generator.py # טסט מלא
-├── generate_synthetic_with_scandit.py  # סקריפט ייצור
-├── config.yaml                         # הגדרות
-├── .gitignore                          # Git ignore
-└── README.md                           # המסמך הזה
+│   └── barcode_detector.py            # Scandit SDK wrapper
+│
+├── generate_synthetic_with_scandit.py # Main script
+├── quick_test_scandit.py              # Quick test script
+└── test_rami_levi_patterns.py         # Pattern validation
 ```
 
-## סקריפטים זמינים
+## Configuration
 
-### `quick_test_scandit.py`
-טסט מהיר על תמונה אחת
+Edit `config.yaml` to set your Scandit license key.
+
+## Testing
+
+### Test Pattern Generation
+
+```bash
+python3 test_rami_levi_patterns.py
+```
+
+### Quick Test on Sample Image
+
 ```bash
 python3 quick_test_scandit.py
 ```
 
-### `test_scandit_synthetic_generator.py`
-טסט על dataset קטן
-```bash
-python3 test_scandit_synthetic_generator.py
-```
+## Progress Reporting
 
-### `generate_synthetic_with_scandit.py`
-ייצור dataset מלא עם אופציות CLI
-```bash
-python3 generate_synthetic_with_scandit.py \
-    --input-images /path/to/images \
-    --input-labels /path/to/labels \
-    --output-images /path/to/output/images \
-    --output-labels /path/to/output/labels \
-    --num-augmentations 5
-```
+The generator prints progress reports every 10 frames showing:
+- DataMatrix detected
+- Barcodes added
+- Images processed
 
-## איך זה עובד?
+## Dependencies
 
-### 1. זיהוי ברקודים
-```python
-detected_barcodes = detect_all_barcodes(image)
-# Returns:
-# {
-#   'datamatrix_l1': [{'data': 'L1ABC123', 'corners': [...]}],
-#   'code128': [{'data': 'SHELF001', 'corners': [...]}],
-#   'other': [...]
-# }
-```
+- Python 3.8+
+- PyTorch 2.0+
+- OpenCV 4.8+
+- Scandit SDK (included)
+- libdmtx (system library)
 
-### 2. החלפה במיקום מדויק
-- מקבל את הקואורדינטות של הפינות
-- יוצר ברקוד חדש עם L1 prefix
-- משתמש ב-perspective transform להתאמת זווית
-- מדביק במיקום המדויק של הברקוד המקורי
-
-### 3. ברקודים רנדומליים (fallback)
-אם לא נמצאו ברקודים:
-- Code128 על מדפים
-- DataMatrix (L1-prefix) על משטחים
-- גדלים ריאליסטיים לפי התפלגות אמיתית
-
-## פורמט YOLO
-
-תוויות נוצרות בפורמט YOLO סטנדרטי:
-```
-class_id x_center y_center width height
-5 0.4532 0.6234 0.0823 0.0512    # shelf_barcode
-3 0.7821 0.3421 0.0612 0.0923    # product_barcode (DataMatrix)
-```
-
-## בעיות נפוצות
-
-### "Could not import Scandit SDK"
-וודא ש-`scandit/scanditsdk.py` קיים ו-libscandit.so נמצא
-
-### "License validation failed"
-בדוק שה-license key ב-config.yaml תקף
-
-### "No barcodes detected"
-- נסה תמונות ברזולוציה גבוהה יותר
-- וודא שהברקודים ברורים ולא מטושטשים
-- המערכת תפעל במצב fallback (ברקודים רנדומליים)
-
-## תיעוד נוסף
-
-- [SCANDIT_SYNTHETIC_DATA_README.md](SCANDIT_SYNTHETIC_DATA_README.md) - תיעוד מפורט של הזיהוי
-- [UPDATED_SCANDIT_INTEGRATION.md](UPDATED_SCANDIT_INTEGRATION.md) - עדכון האינטגרציה
-
-## רישיון
-
-הקוד משתמש ב-Scandit SDK שדורש רשיון מסחרי.
-
----
-
-**נוצר עם ❤️ על ידי Claude Code**
+See requirements.txt for complete list.

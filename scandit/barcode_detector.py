@@ -2,7 +2,6 @@
 import os, sys, re, csv, fnmatch, time, yaml, tempfile
 import numpy as np
 import cv2
-from utils import *
 
 # ---------- project paths ----------
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -45,8 +44,16 @@ except Exception:
 # Scandit Decoder
 # ===========================
 class ScanditDecoder:
-    def __init__(self, license_key):
+    def __init__(self, license_key, scandit_to_wds_type=None):
         try:
+            # Scandit to WDS type mapping (for compatibility with working code)
+            self.scandit_to_wds_type = scandit_to_wds_type or {
+                'code128': 'Code 128',
+                'data-matrix': 'Datamatrix',
+                'qr': 'QR Code',
+                'ean13': 'EAN-13'
+            }
+
             self.context  = sc.RecognitionContext(license_key, tempfile.gettempdir())
             self.settings = self._create_settings()
             self.scanner  = sc.BarcodeScanner(self.context, self.settings)
@@ -156,9 +163,10 @@ class ScanditDecoder:
         hits = []
         for code in self.scanner.session.newly_recognized_codes:
             q = code.location
+            symbology = code.symbology_string
             hits.append({
                 "Decoded Data": code.data,
-                "Symbology": code.symbology_string,
+                "Symbology": self.scandit_to_wds_type.get(symbology, symbology),
                 "Corners": [
                     (q.top_left.x, q.top_left.y),
                     (q.top_right.x, q.top_right.y),

@@ -126,18 +126,18 @@ class ImprovedWarehouseBarcodeGenerator:
                 f.write(ann.to_yolo_string() + '\n')
 
     def generate_random_text(self, barcode_type: str) -> str:
-        """Generate random text for barcode"""
+        """Generate random text for barcode following Rami Levi patterns"""
         if barcode_type == 'code128':
-            # Code128: alphanumeric, 8-15 chars
-            length = random.randint(8, 15)
-            chars = string.ascii_uppercase + string.digits
-            return ''.join(random.choices(chars, k=length))
+            # Shelf barcode pattern: ^\d{4}1\d{2}$
+            # Format: 4 digits + '1' + 2 digits = 7 digits total
+            first_four = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+            last_two = ''.join([str(random.randint(0, 9)) for _ in range(2)])
+            return f"{first_four}1{last_two}"
         else:  # datamatrix
-            # DataMatrix: starts with L1 followed by alphanumeric
-            length = random.randint(6, 12)
-            chars = string.ascii_uppercase + string.digits
-            suffix = ''.join(random.choices(chars, k=length))
-            return f"L1{suffix}"
+            # Product barcode pattern: ^L1(0{9}\d{9})$
+            # Format: L1 + 9 zeros + 9 random digits = 20 chars total
+            nine_digits = ''.join([str(random.randint(0, 9)) for _ in range(9)])
+            return f"L1000000000{nine_digits}"
 
     def create_code128(self, text: str, target_size: Tuple[int, int]) -> np.ndarray:
         """
@@ -335,13 +335,15 @@ class ImprovedWarehouseBarcodeGenerator:
                 'symbology': symbology
             }
 
-            # Categorize by type
-            if "DATA_MATRIX" in symbology.upper() or "DATAMATRIX" in symbology.upper():
+            # Categorize by type (check both original Scandit format and mapped format)
+            symbology_normalized = symbology.upper().replace(" ", "").replace("-", "").replace("_", "")
+
+            if "DATAMATRIX" in symbology_normalized:
                 if re.match(r'^L1', data, re.IGNORECASE):
                     categorized['datamatrix_l1'].append(barcode_info)
                 else:
                     categorized['other'].append(barcode_info)
-            elif "CODE128" in symbology.upper() or "CODE_128" in symbology.upper():
+            elif "CODE128" in symbology_normalized:
                 categorized['code128'].append(barcode_info)
             else:
                 categorized['other'].append(barcode_info)

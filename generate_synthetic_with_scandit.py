@@ -191,7 +191,8 @@ def main():
             output_images_dir=output_images,
             output_labels_dir=output_labels,
             num_augmentations_per_image=args.num_augmentations,
-            replace_detected_l1=(not args.no_replace_l1)
+            replace_detected=(not args.no_replace_l1),
+            add_random_barcodes=True  # Add random barcodes if no barcodes detected
         )
     except KeyboardInterrupt:
         print("\n\nInterrupted by user")
